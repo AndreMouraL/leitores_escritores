@@ -15,7 +15,7 @@ O sistema garante que:
 ✅ Controle de starvation com timeouts configuráveis
 
 🏗️ Estrutura do Projeto
-text
+
 leitores_escritores/
 ├── include/
 │   └── biblioteca.h          # Headers e definições
@@ -31,7 +31,7 @@ leitores_escritores/
 │   └── parse.c              # Parsing de argumentos
 ├── scripts/
 │   ├── compilar.sh          # Script de compilação
-│   └── converter.ps1        # Conversor para visualizador
+│  
 ├── Makefile                 # Build automation
 └── README.md               # Este arquivo
 🚀 Como Compilar e Executar
