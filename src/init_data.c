@@ -1,35 +1,35 @@
-#include "../include/biblioteca.h"
+#include "../include/banco.h"
 
-int	inicializar_threads(t_dados *dados)
+int	inicializar_transacoes(t_dados *dados)
 {
 	int	i;
 
-	// Inicializar leitores
+	// Inicializar consultores
 	i = -1;
-	while (++i < dados->nb_leitores)
+	while (++i < dados->nb_consultores)
 	{
-		dados->leitores[i].dados = dados;
-		dados->leitores[i].id = i + 1;
-		dados->leitores[i].tipo = LEITOR;
-		dados->leitores[i].estado = ESPERANDO;
-		dados->leitores[i].nb_leituras_concluidas = 0;
-		dados->leitores[i].ultimo_tempo_acesso = get_tempo();
-		pthread_mutex_init(&dados->leitores[i].mut_estado, NULL);
-		pthread_mutex_init(&dados->leitores[i].mut_leituras_concluidas, NULL);
+		dados->consultores[i].dados = dados;
+		dados->consultores[i].id = i + 1;
+		dados->consultores[i].tipo = CONSULTOR;
+		dados->consultores[i].estado = AGUARDANDO;
+		dados->consultores[i].nb_operacoes_concluidas = 0;
+		dados->consultores[i].ultimo_tempo_acesso = get_tempo();
+		pthread_mutex_init(&dados->consultores[i].mut_estado, NULL);
+		pthread_mutex_init(&dados->consultores[i].mut_operacoes, NULL);
 	}
 
-	// Inicializar escritores
+	// Inicializar operadores
 	i = -1;
-	while (++i < dados->nb_escritores)
+	while (++i < dados->nb_operadores)
 	{
-		dados->escritores[i].dados = dados;
-		dados->escritores[i].id = i + 1;
-		dados->escritores[i].tipo = ESCRITOR;
-		dados->escritores[i].estado = ESPERANDO;
-		dados->escritores[i].nb_leituras_concluidas = 0;
-		dados->escritores[i].ultimo_tempo_acesso = get_tempo();
-		pthread_mutex_init(&dados->escritores[i].mut_estado, NULL);
-		pthread_mutex_init(&dados->escritores[i].mut_leituras_concluidas, NULL);
+		dados->operadores[i].dados = dados;
+		dados->operadores[i].id = i + 1;
+		dados->operadores[i].tipo = OPERADOR;
+		dados->operadores[i].estado = AGUARDANDO;
+		dados->operadores[i].nb_operacoes_concluidas = 0;
+		dados->operadores[i].ultimo_tempo_acesso = get_tempo();
+		pthread_mutex_init(&dados->operadores[i].mut_estado, NULL);
+		pthread_mutex_init(&dados->operadores[i].mut_operacoes, NULL);
 	}
 
 	return (0);
@@ -37,47 +37,48 @@ int	inicializar_threads(t_dados *dados)
 
 int	alocar_dados(t_dados *dados)
 {
-	// Alocar leitores
-	dados->leitores = malloc(sizeof(t_thread) * dados->nb_leitores);
-	if (dados->leitores == NULL)
+	// Alocar consultores
+	dados->consultores = malloc(sizeof(t_transacao) * dados->nb_consultores);
+	if (dados->consultores == NULL)
 		return (ERRO_ALOCACAO);
 
-	dados->threads_leitores = malloc(sizeof(pthread_t) * dados->nb_leitores);
-	if (dados->threads_leitores == NULL)
-		return (free(dados->leitores), ERRO_ALOCACAO);
+	dados->threads_consultores = malloc(sizeof(pthread_t) * dados->nb_consultores);
+	if (dados->threads_consultores == NULL)
+		return (free(dados->consultores), ERRO_ALOCACAO);
 
-	// Alocar escritores
-	dados->escritores = malloc(sizeof(t_thread) * dados->nb_escritores);
-	if (dados->escritores == NULL)
-		return (free(dados->leitores), free(dados->threads_leitores), ERRO_ALOCACAO);
+	// Alocar operadores
+	dados->operadores = malloc(sizeof(t_transacao) * dados->nb_operadores);
+	if (dados->operadores == NULL)
+		return (free(dados->consultores), free(dados->threads_consultores), ERRO_ALOCACAO);
 
-	dados->threads_escritores = malloc(sizeof(pthread_t) * dados->nb_escritores);
-	if (dados->threads_escritores == NULL)
-		return (free(dados->leitores), free(dados->threads_leitores), free(dados->escritores), ERRO_ALOCACAO);
+	dados->threads_operadores = malloc(sizeof(pthread_t) * dados->nb_operadores);
+	if (dados->threads_operadores == NULL)
+		return (free(dados->consultores), free(dados->threads_consultores), 
+				free(dados->operadores), ERRO_ALOCACAO);
 
 	return (0);
 }
 
 int	inicializar_dados(t_dados *dados, int argc, char **argv)
 {
-	dados->nb_leitores = ft_atoi(argv[1]);
-	dados->nb_escritores = ft_atoi(argv[2]);
+	dados->nb_consultores = ft_atoi(argv[1]);
+	dados->nb_operadores = ft_atoi(argv[2]);
 	dados->tempo_maximo = (uint64_t)ft_atoi(argv[3]);
-	dados->tempo_leitura = (uint64_t)ft_atoi(argv[4]);
-	dados->tempo_escrita = (uint64_t)ft_atoi(argv[5]);
+	dados->tempo_consulta = (uint64_t)ft_atoi(argv[4]);
+	dados->tempo_transferencia = (uint64_t)ft_atoi(argv[5]);
 	dados->tempo_espera = (uint64_t)ft_atoi(argv[6]);
-	dados->nb_leituras_total = -1;
-	dados->nb_escritas_total = -1;
-	dados->manter_execucao = true;
+	dados->nb_consultas_total = -1;
+	dados->nb_transferencias_total = -1;
+	dados->sistema_ativo = true;
 
 	if (argc == 8)
 	{
-		dados->nb_leituras_total = ft_atoi(argv[7]);
-		dados->nb_escritas_total = ft_atoi(argv[7]);
+		dados->nb_consultas_total = ft_atoi(argv[7]);
+		dados->nb_transferencias_total = ft_atoi(argv[7]);
 	}
 
 	pthread_mutex_init(&dados->mut_impressao, NULL);
-	pthread_mutex_init(&dados->mut_manter_exec, NULL);
+	pthread_mutex_init(&dados->mut_sistema, NULL);
 	pthread_mutex_init(&dados->mut_tempo_inicio, NULL);
 
 	return (alocar_dados(dados));

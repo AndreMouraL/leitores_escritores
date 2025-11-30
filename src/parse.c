@@ -1,20 +1,20 @@
-#include "../include/biblioteca.h"
+#include "../include/banco.h"
 
 void	imprimir_instrucoes(void)
 {
 	printf("\t\tENTRADA INVALIDA!\n\n");
-	printf("./biblioteca nb_leitores nb_escritores tempo_maximo ");
-	printf("tempo_leitura tempo_escrita tempo_espera ");
+	printf("./banco_le_esc nb_consultores nb_operadores tempo_maximo ");
+	printf("tempo_consulta tempo_transferencia tempo_espera ");
 	printf("[numero_operacoes]\n");
 	printf("Exemplo:\n\n");
-	printf("./biblioteca 3 2 410 200 100 200 5\n\n");
-	printf("nb_leitores: 1-20\n");
-	printf("nb_escritores: 1-20\n");
-	printf("tempo_maximo: 60+\n");
-	printf("tempo_leitura: 60+\n");
-	printf("tempo_escrita: 60+\n");
-	printf("tempo_espera: 60+\n");
-	printf("numero_operacoes: 0+\n");
+	printf("./banco_le_esc 3 2 410 200 100 200 5\n\n");
+	printf("nb_consultores: 1-10 (leitores - consultas de saldo)\n");
+	printf("nb_operadores: 1-10 (escritores - transferencias)\n");
+	printf("tempo_maximo: 60+ (ms)\n");
+	printf("tempo_consulta: 60+ (ms)\n");
+	printf("tempo_transferencia: 60+ (ms)\n");
+	printf("tempo_espera: 60+ (ms)\n");
+	printf("numero_operacoes: 0+ (opcional)\n");
 }
 
 int	entrada_invalida(int argc, char **argv)
@@ -24,10 +24,10 @@ int	entrada_invalida(int argc, char **argv)
 	if (argc == 8 && ft_atoi(argv[7]) <= 0)
 		return (ENTRADA_INVALIDA);
 
-	if (ft_atoi(argv[1]) < 1 || ft_atoi(argv[1]) > 20)
+	if (ft_atoi(argv[1]) < 1 || ft_atoi(argv[1]) > 10)
 		return (ENTRADA_INVALIDA);
 
-	if (ft_atoi(argv[2]) < 1 || ft_atoi(argv[2]) > 20)
+	if (ft_atoi(argv[2]) < 1 || ft_atoi(argv[2]) > 10)
 		return (ENTRADA_INVALIDA);
 
 	i = 2;

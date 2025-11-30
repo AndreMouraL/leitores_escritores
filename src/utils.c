@@ -1,4 +1,4 @@
-#include "../include/biblioteca.h"
+#include "../include/banco.h"
 
 uint64_t	get_tempo_inicio(t_dados *dados)
 {
@@ -12,34 +12,34 @@ uint64_t	get_tempo_inicio(t_dados *dados)
 
 bool	opcao_nb_operacoes(t_dados *dados)
 {
-	if (dados->nb_leituras_total > 0 && dados->nb_escritas_total > 0)
+	if (dados->nb_consultas_total > 0 && dados->nb_transferencias_total > 0)
 		return (true);
 	return (false);
 }
 
-bool	get_manter_execucao(t_dados *dados)
+bool	get_sistema_ativo(t_dados *dados)
 {
-	bool	manter_execucao;
+	bool	sistema_ativo;
 
-	pthread_mutex_lock(&dados->mut_manter_exec);
-	manter_execucao = dados->manter_execucao;
-	pthread_mutex_unlock(&dados->mut_manter_exec);
-	return (manter_execucao);
+	pthread_mutex_lock(&dados->mut_sistema);
+	sistema_ativo = dados->sistema_ativo;
+	pthread_mutex_unlock(&dados->mut_sistema);
+	return (sistema_ativo);
 }
 
-void	set_manter_execucao(t_dados *dados, bool definir_para)
+void	set_sistema_ativo(t_dados *dados, bool ativo)
 {
-	pthread_mutex_lock(&dados->mut_manter_exec);
-	dados->manter_execucao = definir_para;
-	pthread_mutex_unlock(&dados->mut_manter_exec);
+	pthread_mutex_lock(&dados->mut_sistema);
+	dados->sistema_ativo = ativo;
+	pthread_mutex_unlock(&dados->mut_sistema);
 }
 
-void	set_estado_thread(t_thread *thread, t_estado estado)
+void	set_estado_transacao(t_transacao *transacao, t_estado estado)
 {
-	pthread_mutex_lock(&thread->mut_estado);
-	if (thread->estado != BLOQUEADO)
-		thread->estado = estado;
-	pthread_mutex_unlock(&thread->mut_estado);
+	pthread_mutex_lock(&transacao->mut_estado);
+	if (transacao->estado != BLOQUEADA)
+		transacao->estado = estado;
+	pthread_mutex_unlock(&transacao->mut_estado);
 }
 
 void	imprimir_msg(t_dados *dados, int id, char *msg, t_tipo tipo)
@@ -48,10 +48,10 @@ void	imprimir_msg(t_dados *dados, int id, char *msg, t_tipo tipo)
 	char		*tipo_str;
 
 	tempo = get_tempo() - get_tempo_inicio(dados);
-	tipo_str = (tipo == LEITOR) ? "LEITOR" : "ESCRITOR";
+	tipo_str = (tipo == CONSULTOR) ? "CONSULTOR" : "OPERADOR";
 
 	pthread_mutex_lock(&dados->mut_impressao);
-	if (get_manter_execucao(dados))
+	if (get_sistema_ativo(dados))
 		printf("%llu %s %d %s\n", tempo, tipo_str, id, msg);
 	pthread_mutex_unlock(&dados->mut_impressao);
 }
@@ -60,33 +60,33 @@ void	liberar_dados(t_dados *dados)
 {
 	int	i;
 
-	// Liberar leitores
+	// Liberar consultores
 	i = -1;
-	while (++i < dados->nb_leitores)
+	while (++i < dados->nb_consultores)
 	{
-		pthread_mutex_destroy(&dados->leitores[i].mut_estado);
-		pthread_mutex_destroy(&dados->leitores[i].mut_leituras_concluidas);
+		pthread_mutex_destroy(&dados->consultores[i].mut_estado);
+		pthread_mutex_destroy(&dados->consultores[i].mut_operacoes);
 	}
 
-	// Liberar escritores
+	// Liberar operadores
 	i = -1;
-	while (++i < dados->nb_escritores)
+	while (++i < dados->nb_operadores)
 	{
-		pthread_mutex_destroy(&dados->escritores[i].mut_estado);
-		pthread_mutex_destroy(&dados->escritores[i].mut_leituras_concluidas);
+		pthread_mutex_destroy(&dados->operadores[i].mut_estado);
+		pthread_mutex_destroy(&dados->operadores[i].mut_operacoes);
 	}
 
-	// Liberar biblioteca
-	liberar_biblioteca(&dados->biblioteca);
+	// Liberar controle (mutex + semáforos)
+	liberar_controle(&dados->controle);
 
 	// Liberar mutexes principais
 	pthread_mutex_destroy(&dados->mut_impressao);
-	pthread_mutex_destroy(&dados->mut_manter_exec);
+	pthread_mutex_destroy(&dados->mut_sistema);
 	pthread_mutex_destroy(&dados->mut_tempo_inicio);
 
 	// Liberar memória
-	free(dados->threads_leitores);
-	free(dados->threads_escritores);
-	free(dados->leitores);
-	free(dados->escritores);
+	free(dados->threads_consultores);
+	free(dados->threads_operadores);
+	free(dados->consultores);
+	free(dados->operadores);
 }
