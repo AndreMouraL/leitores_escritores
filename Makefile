@@ -1,42 +1,57 @@
+# **************************************************************************** #
+#                                                                              #
+#    Makefile para Windows - Leitores e Escritores                            #
+#                                                                              #
+# **************************************************************************** #
+
 NAME = biblioteca
 CC = gcc
-RM = rm -rf
 CFLAGS = -Wall -Wextra -Werror -g -pthread
-
 SRC_DIR = src/
-OBJ_DIR = objects/
+INCLUDE = -Iinclude
 
-SRC =	main \
-		init_data \
-		leitor \
-		escritor \
-		biblioteca \
-		monitor \
-		tempo \
-		utils \
-		parse
+# Comandos Windows
+RM = del /Q
+MKDIR = mkdir
+RMDIR = rmdir /S /Q
 
-SRCS = $(addprefix $(SRC_DIR), $(addsuffix .c, $(SRC)))
-OBJS = $(addprefix $(OBJ_DIR), $(addsuffix .o, $(SRC)))
+# Lista de arquivos fonte
+# Lista de arquivos fonte - ADICIONAR biblioteca.c
+SOURCES = $(SRC_DIR)main.c \
+          $(SRC_DIR)init_data.c \
+          $(SRC_DIR)leitor.c \
+          $(SRC_DIR)escritor.c \
+          $(SRC_DIR)biblioteca.c \
+          $(SRC_DIR)monitor.c \
+          $(SRC_DIR)tempo.c \
+          $(SRC_DIR)utils.c \
+          $(SRC_DIR)parse.c
 
 all: $(NAME)
 
-$(NAME): $(OBJS)
-	@$(CC) $(CFLAGS) -o $(NAME) $(OBJS)
-
-$(OBJ_DIR)%.o: $(SRC_DIR)%.c 
-	@mkdir -p $(@D)
-	@$(CC) $(CFLAGS) -c $< -o $@ -Iinclude
+$(NAME):
+	@echo " Compilando sistema de leitores e escritores..."
+	@$(CC) $(CFLAGS) $(INCLUDE) -o $(NAME).exe $(SOURCES)
+	@echo " Biblioteca compilada: $(NAME).exe"
 
 clean:
-	@$(RM) $(OBJ_DIR)
+	@if exist $(NAME).exe $(RM) $(NAME).exe
+	@if exist objects $(RMDIR) objects
+	@echo " Arquivos limpos"
 
 fclean: clean
-	@$(RM) $(NAME) 
 
 re: fclean all
 
 run: all
-	@./$(NAME) 3 2 410 200 100 200 5
+	@echo " Executando sistema..."
+	@.\$(NAME).exe 3 2 410 200 100 200 5
 
-.PHONY: all clean fclean re run
+help:
+	@echo "Targets disponíveis:"
+	@echo "  all     - Compila o programa"
+	@echo "  run     - Compila e executa com parâmetros padrão"
+	@echo "  clean   - Remove executável"
+	@echo "  re      - Recompila completamente"
+
+.PHONY: all clean fclean re run help

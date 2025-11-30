@@ -89,6 +89,10 @@ int				sistema_biblioteca(int argc, char **argv);
 int				inicializar_dados(t_dados *dados, int argc, char **argv);
 int				inicializar_threads(t_dados *dados);
 
+// biblioteca.c
+int				inicializar_biblioteca(t_biblioteca *biblioteca);
+void			liberar_biblioteca(t_biblioteca *biblioteca);
+
 // leitor.c
 void			*rotina_leitor(void *thread_p);
 int				ler(t_thread *thread);
@@ -105,6 +109,9 @@ void			sair_biblioteca_escritor(t_thread *thread);
 void			*todos_ativos_rotina(void *dados_p);
 void			*todos_concluidos_rotina(void *dados_p);
 bool			thread_morreu(t_thread *thread);
+bool			todos_leitores_concluidos(t_dados *dados);
+bool			todos_escritores_concluidos(t_dados *dados);
+void			notificar_todas_threads(t_dados *dados);
 
 // tempo.c
 uint64_t		get_tempo(void);
@@ -117,6 +124,7 @@ bool			opcao_nb_operacoes(t_dados *dados);
 bool			get_manter_execucao(t_dados *dados);
 void			set_manter_execucao(t_dados *dados, bool definir_para);
 void			set_estado_thread(t_thread *thread, t_estado estado);
+uint64_t		get_tempo_inicio(t_dados *dados);
 
 // parse.c
 int				verificar_entrada(int argc, char **argv);

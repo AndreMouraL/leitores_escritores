@@ -1,5 +1,15 @@
 #include "../include/biblioteca.h"
 
+uint64_t	get_tempo_inicio(t_dados *dados)
+{
+	uint64_t	tempo;
+
+	pthread_mutex_lock(&dados->mut_tempo_inicio);
+	tempo = dados->tempo_inicio;
+	pthread_mutex_unlock(&dados->mut_tempo_inicio);
+	return (tempo);
+}
+
 bool	opcao_nb_operacoes(t_dados *dados)
 {
 	if (dados->nb_leituras_total > 0 && dados->nb_escritas_total > 0)
@@ -44,16 +54,6 @@ void	imprimir_msg(t_dados *dados, int id, char *msg, t_tipo tipo)
 	if (get_manter_execucao(dados))
 		printf("%llu %s %d %s\n", tempo, tipo_str, id, msg);
 	pthread_mutex_unlock(&dados->mut_impressao);
-}
-
-uint64_t	get_tempo_inicio(t_dados *dados)
-{
-	uint64_t	tempo;
-
-	pthread_mutex_lock(&dados->mut_tempo_inicio);
-	tempo = dados->tempo_inicio;
-	pthread_mutex_unlock(&dados->mut_tempo_inicio);
-	return (tempo);
 }
 
 void	liberar_dados(t_dados *dados)
