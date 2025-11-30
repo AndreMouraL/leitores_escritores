@@ -1,0 +1,82 @@
+# Executáveis
+biblioteca
+biblioteca.exe
+*.exe
+
+# Arquivos objeto
+objects/
+*.o
+*.obj
+
+# Arquivos de saída
+saida.txt
+visualizer_output.txt
+*.txt
+
+# Logs
+*.log
+debug/
+
+# Backup files
+*~
+*.bak
+*.swp
+*.swo
+
+# IDE files
+.vscode/
+.idea/
+*.workspace
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# Documentation
+*.pdf
+*.doc
+*.docx
+
+# Dependencies
+deps/
+libs/
+
+# Test files
+test_output/
+*.test
+
+# Coverage reports
+coverage/
+*.gcda
+*.gcno
+*.gcov
+
+# Profiling data
+gmon.out
+*.prof
+
+# Compiled Shared libraries
+*.so
+*.dylib
+*.dll
+
+# Build directories
+build/
+dist/
+
+# Makefile generated files
+*.d
+*.mk
+
+# Backup of patch files
+*.orig
+*.rej
