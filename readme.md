@@ -160,4 +160,4 @@ Monitoramento de sistemas em tempo real
 Nota: Este projeto é educativo e demonstra conceitos avançados de programação concorrente aplicados a sistemas bancários, garantindo a segurança e consistência das transações financeiras.
 
 
-
+Desenvolvido por Andre Moura na disciplina de tempo real UFMA, o uso indevido sem mensão acarretarar em sações judiciais.
